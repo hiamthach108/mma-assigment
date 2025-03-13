@@ -1,4 +1,4 @@
-import ArtToolCard from '@/components/ArtTool';
+import ArtToolCard from '@/components/ArtToolCard';
 import MyScrollView from '@/components/MyScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import artToolApi from '@/config/api/artToolApi';
@@ -33,8 +33,10 @@ export default function HomeScreen() {
     };
   }, []);
 
+  console.log('Data:', data);
+
   const renderItem = ({ item }: { item: ArtTool }) => (
-    <View style={styles.cardContainer}>
+    <View style={styles.cardContainer} key={item.id}>
       <ArtToolCard item={item} />
     </View>
   );

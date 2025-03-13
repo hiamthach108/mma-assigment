@@ -4,9 +4,10 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios';
+import { API_URL } from '../constants/env';
 
 const api: AxiosInstance = axios.create({
-  baseURL: process.env.API_URL,
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
