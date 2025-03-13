@@ -1,36 +1,30 @@
-import { View, Text } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Pressable, View, Text, Image, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons'; // Assuming you're using expo icons
 import { ArtTool } from '@/types/artTool';
-import { Link } from 'expo-router';
-import {
-  addFavorite,
-  isFavorite,
-  removeFavorite,
-} from '@/config/helpers/asyncstorage';
-
-import { Image, StyleSheet } from 'react-native';
-import { Pressable } from 'react-native-gesture-handler';
-import { Ionicons } from '@expo/vector-icons';
+import { Link } from 'expo-router'; // Assuming you're using expo-router
+import { useFavorites } from '@/hooks/useFavorites';
 
 const ArtToolCard = ({ item }: { item: ArtTool }) => {
   const [isFav, setIsFav] = useState(false);
+  const { favorites, isFavorite, addFavorite, removeFavorite } = useFavorites();
 
+  // Update favorite status whenever favorites or item.id changes
   useEffect(() => {
-    checkFavoriteStatus();
-  }, []);
-
-  const checkFavoriteStatus = async () => {
-    const status = await isFavorite(item.id);
+    const status = isFavorite(item.id);
     setIsFav(status);
-  };
+  }, [favorites, item.id, isFavorite]);
 
   const toggleFavorite = async () => {
-    if (isFav) {
-      await removeFavorite(item.id);
-      setIsFav(false);
-    } else {
-      await addFavorite(item);
-      setIsFav(true);
+    try {
+      if (isFav) {
+        await removeFavorite(item.id);
+      } else {
+        await addFavorite(item);
+      }
+      // No need to manually setIsFav here; useEffect will handle it
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
     }
   };
 
@@ -53,9 +47,7 @@ const ArtToolCard = ({ item }: { item: ArtTool }) => {
             <View style={styles.dealBadge}>
               <Text style={styles.dealText}>Sale</Text>
             </View>
-          ) : (
-            <></>
-          )}
+          ) : null}
         </View>
 
         <Link href={`/art-tools/${item.id}`}>

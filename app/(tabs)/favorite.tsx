@@ -1,40 +1,44 @@
-import ArtToolCard from '@/components/ArtToolCard';
-import MyScrollView from '@/components/MyScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { getFavorites } from '@/config/helpers/asyncstorage';
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, FlatList, RefreshControl } from 'react-native';
 import { ArtTool } from '@/types/artTool';
-import { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, FlatList } from 'react-native';
+import ArtToolCard from '@/components/ArtToolCard';
+import { ThemedText } from '@/components/ThemedText';
+import { useFocusEffect } from '@react-navigation/native';
+import { useFavorites } from '@/hooks/useFavorites';
 
 export default function FavoriteScreen() {
-  const [favorites, setFavorites] = useState<ArtTool[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { favorites, loading, refreshFavorites } = useFavorites();
+  const [refreshing, setRefreshing] = useState(false);
 
-  const fetchFavorites = async () => {
-    try {
-      const favs = await getFavorites();
-      setFavorites(favs);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching favorites:', error);
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchFavorites();
-  }, []);
-
-  const renderItem = ({ item }: { item: ArtTool }) => (
-    <View style={styles.cardContainer} key={item.id}>
-      <ArtToolCard item={item} />
-    </View>
+  // Refresh favorites when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('Screen focused, refreshing favorites');
+      refreshFavorites();
+    }, [refreshFavorites])
   );
 
+  // Handle manual refresh
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await refreshFavorites();
+    setRefreshing(false);
+  }, [refreshFavorites]);
+
+  const renderItem = ({ item }: { item: ArtTool }) => {
+    return (
+      <View style={styles.cardContainer}>
+        <ArtToolCard item={item} />
+      </View>
+    );
+  };
+
   return (
-    <MyScrollView>
-      {loading ? (
-        <ThemedText>Loading...</ThemedText>
+    <View style={styles.container}>
+      {loading && favorites.length === 0 ? (
+        <View style={styles.centered}>
+          <ThemedText>Loading...</ThemedText>
+        </View>
       ) : (
         <FlatList
           data={favorites}
@@ -45,13 +49,22 @@ export default function FavoriteScreen() {
           numColumns={2}
           columnWrapperStyle={styles.columnWrapper}
           ListEmptyComponent={
-            <View>
-              <Text>No art tools found. Try adjusting your filters.</Text>
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>
+                No favorite art tools yet. Add some to see them here!
+              </Text>
             </View>
+          }
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#888"
+            />
           }
         />
       )}
-    </MyScrollView>
+    </View>
   );
 }
 
@@ -60,13 +73,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8f8f8',
     padding: 16,
-  },
-  header: {
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
   },
   centered: {
     flex: 1,
@@ -78,6 +84,7 @@ const styles = StyleSheet.create({
   },
   columnWrapper: {
     justifyContent: 'space-between',
+    marginHorizontal: 4,
   },
   cardContainer: {
     width: '48%',
@@ -88,6 +95,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    minHeight: 300,
   },
   emptyText: {
     fontSize: 16,
