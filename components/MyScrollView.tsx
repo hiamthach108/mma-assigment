@@ -8,7 +8,7 @@ const MyScrollView = ({ children, ...props }: PropsWithChildren<any>) => {
       <Animated.ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={true}
+        showsVerticalScrollIndicator={false}
         {...props}
       >
         {children}
