@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -60,7 +60,19 @@ const DetailPage = () => {
     }
   };
 
-  if (loading) {
+  const averageRating = useMemo(() => {
+    if (!data || !data.feedbacks || data.feedbacks.length === 0) {
+      return 0;
+    }
+
+    const totalRating = data.feedbacks.reduce(
+      (acc, feedback) => acc + feedback.rating,
+      0
+    );
+    return totalRating / data.feedbacks.length;
+  }, [data]);
+
+  if (loading && !data) {
     return <LoadingScreen />;
   }
 
@@ -75,12 +87,6 @@ const DetailPage = () => {
     );
   }
 
-  const averageRating =
-    data.feedbacks && data.feedbacks.length > 0
-      ? data.feedbacks.reduce((sum, feedback) => sum + feedback.rating, 0) /
-        data.feedbacks.length
-      : 0;
-
   return (
     <MyScrollView
       contentContainerStyle={{
@@ -88,9 +94,6 @@ const DetailPage = () => {
       }}
     >
       <View style={styles.header}>
-        <Pressable style={styles.backIconButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </Pressable>
         <Pressable style={styles.favoriteButton} onPress={toggleFavorite}>
           <Ionicons
             name={isFav ? 'heart' : 'heart-outline'}
@@ -109,10 +112,12 @@ const DetailPage = () => {
 
       {/* Product Info */}
       <View style={styles.infoContainer}>
-        {data.limitedTimeDeal && (
+        {data.limitedTimeDeal ? (
           <View style={styles.dealBadge}>
             <Text style={styles.dealText}>Sale</Text>
           </View>
+        ) : (
+          <></>
         )}
 
         <Text style={styles.brand}>{data.brand}</Text>
@@ -193,7 +198,7 @@ const DetailPage = () => {
 const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
     paddingVertical: 16,
   },

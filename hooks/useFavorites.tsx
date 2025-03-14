@@ -21,6 +21,7 @@ interface FavoritesContextType {
   isFavorite: (artToolId: string) => boolean;
   clearAllFavorites: () => Promise<boolean>;
   refreshFavorites: () => Promise<void>;
+  resetFavorites: () => Promise<void>;
 }
 
 // Create the context with default values
@@ -33,6 +34,7 @@ const FavoritesContext = createContext<FavoritesContextType>({
   isFavorite: () => false,
   clearAllFavorites: async () => false,
   refreshFavorites: async () => {},
+  resetFavorites: async () => {},
 });
 
 // Provider component
@@ -163,6 +165,19 @@ export const FavoritesProvider: React.FC<FavoritesProviderProps> = ({
     await loadFavorites();
   }, [loadFavorites]);
 
+  // Reset favorites to default
+  const resetFavorites = useCallback(async () => {
+    try {
+      await AsyncStorage.removeItem(FAVORITES_KEY);
+      setFavorites([]);
+    } catch (err) {
+      const error =
+        err instanceof Error ? err : new Error('Failed to reset favorites');
+      setError(error);
+      console.error('Error resetting favorites:', err);
+    }
+  }, []);
+
   // Create the context value
   const value: FavoritesContextType = {
     favorites,
@@ -173,6 +188,7 @@ export const FavoritesProvider: React.FC<FavoritesProviderProps> = ({
     isFavorite,
     clearAllFavorites,
     refreshFavorites,
+    resetFavorites,
   };
 
   return (

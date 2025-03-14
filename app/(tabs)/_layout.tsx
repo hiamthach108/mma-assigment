@@ -1,20 +1,20 @@
-import { Tabs } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, Pressable } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useFavorites } from '@/hooks/useFavorites';
+import { PRIMARY_COLOR } from '@/constants/Colors';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function TabLayout() {
-  useFavorites();
+  const router = useRouter();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors['light'].tint,
+        tabBarActiveTintColor: PRIMARY_COLOR,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
@@ -22,7 +22,9 @@ export default function TabLayout() {
           ios: {
             position: 'absolute',
           },
-          default: {},
+          default: {
+            height: 56,
+          },
         }),
       }}
     >
@@ -44,6 +46,26 @@ export default function TabLayout() {
             <IconSymbol size={24} name="heart.fill" color={color} />
           ),
           headerShown: true,
+        }}
+      />
+
+      <Tabs.Screen
+        name="art-tools/[id]"
+        options={{
+          title: 'ArtTool Detail',
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={24} name="gearshape.fill" color={color} />
+          ),
+          headerShown: true,
+          href: null,
+          headerLeft: () => (
+            <Pressable
+              onPress={() => router.back()}
+              style={{ marginHorizontal: 12 }}
+            >
+              <Ionicons name="arrow-back" size={24} color={PRIMARY_COLOR} />
+            </Pressable>
+          ),
         }}
       />
     </Tabs>
