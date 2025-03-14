@@ -20,6 +20,8 @@ const MyScrollView = ({ children, ...props }: PropsWithChildren<any>) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f8f8f8',
+    paddingHorizontal: 20,
   },
   scrollView: {
     flex: 1,

@@ -1,7 +1,9 @@
 import ArtToolCard from '@/components/ArtToolCard';
+import LoadingScreen from '@/components/LoadingScreen';
 import MyScrollView from '@/components/MyScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import artToolApi from '@/config/api/artToolApi';
+import { BACKGROUND_COLOR } from '@/constants/Colors';
 import { ArtTool } from '@/types/artTool';
 import { useEffect, useState } from 'react';
 import { FlatList, View, Text, StyleSheet } from 'react-native';
@@ -41,26 +43,26 @@ export default function HomeScreen() {
     </View>
   );
 
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
-    <MyScrollView>
-      {loading ? (
-        <ThemedText>Loading...</ThemedText>
-      ) : (
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-          numColumns={2}
-          columnWrapperStyle={styles.columnWrapper}
-          ListEmptyComponent={
-            <View>
-              <Text>No art tools found. Try adjusting your filters.</Text>
-            </View>
-          }
-        />
-      )}
+    <MyScrollView style={styles.container}>
+      <FlatList
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+        numColumns={2}
+        columnWrapperStyle={styles.columnWrapper}
+        ListEmptyComponent={
+          <View>
+            <Text>No art tools found. Try adjusting your filters.</Text>
+          </View>
+        }
+      />
     </MyScrollView>
   );
 }
@@ -68,20 +70,8 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
-    padding: 16,
-  },
-  header: {
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: BACKGROUND_COLOR,
+    paddingTop: 12,
   },
   listContent: {
     paddingBottom: 20,
@@ -91,17 +81,5 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     width: '48%',
-    marginBottom: 16,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#888',
-    textAlign: 'center',
   },
 });

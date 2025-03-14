@@ -1,6 +1,7 @@
 import { View, Text } from 'react-native';
 import React from 'react';
 import { useLocalSearchParams } from 'expo-router';
+import MyScrollView from '@/components/MyScrollView';
 
 const DetailPage = () => {
   const { id } = useLocalSearchParams();
@@ -8,9 +9,9 @@ const DetailPage = () => {
   console.log('id', id);
 
   return (
-    <View>
+    <MyScrollView>
       <Text>DetailPage {id}</Text>
-    </View>
+    </MyScrollView>
   );
 };
 

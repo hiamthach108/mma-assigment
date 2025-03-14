@@ -5,6 +5,7 @@ import ArtToolCard from '@/components/ArtToolCard';
 import { ThemedText } from '@/components/ThemedText';
 import { useFocusEffect } from '@react-navigation/native';
 import { useFavorites } from '@/hooks/useFavorites';
+import MyScrollView from '@/components/MyScrollView';
 
 export default function FavoriteScreen() {
   const { favorites, loading, refreshFavorites } = useFavorites();
@@ -34,7 +35,7 @@ export default function FavoriteScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <MyScrollView>
       {loading && favorites.length === 0 ? (
         <View style={styles.centered}>
           <ThemedText>Loading...</ThemedText>
@@ -64,16 +65,11 @@ export default function FavoriteScreen() {
           }
         />
       )}
-    </View>
+    </MyScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f8f8',
-    padding: 16,
-  },
   centered: {
     flex: 1,
     justifyContent: 'center',

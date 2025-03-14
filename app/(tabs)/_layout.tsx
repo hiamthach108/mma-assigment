@@ -31,8 +31,9 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
+            <IconSymbol size={24} name="house.fill" color={color} />
           ),
+          headerShown: true,
         }}
       />
       <Tabs.Screen
@@ -40,8 +41,9 @@ export default function TabLayout() {
         options={{
           title: 'Favorite',
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="paperplane.fill" color={color} />
+            <IconSymbol size={24} name="heart.fill" color={color} />
           ),
+          headerShown: true,
         }}
       />
     </Tabs>

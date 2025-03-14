@@ -24,3 +24,10 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
 };
+
+export const PRIMARY_COLOR = '#636AE8';
+export const SECONDARY_COLOR = '#E8618C';
+export const TERTIARY_COLOR = '#22CCB2';
+
+export const BACKGROUND_COLOR = '#F8F9FAFF';
+export const BORDER_COLOR = '#E5E5E5';

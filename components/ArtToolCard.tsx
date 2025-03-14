@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons'; // Assuming you're using expo ico
 import { ArtTool } from '@/types/artTool';
 import { Link } from 'expo-router'; // Assuming you're using expo-router
 import { useFavorites } from '@/hooks/useFavorites';
+import { PRIMARY_COLOR, SECONDARY_COLOR } from '@/constants/Colors';
 
 const ArtToolCard = ({ item }: { item: ArtTool }) => {
   const [isFav, setIsFav] = useState(false);
@@ -36,37 +37,36 @@ const ArtToolCard = ({ item }: { item: ArtTool }) => {
         resizeMode="cover"
       />
       <View style={styles.contentContainer}>
-        <Text style={styles.brand}>{item.brand}</Text>
+        <View style={styles.priceContainer}>
+          <Text style={styles.price}>${item.price}</Text>
+        </View>
         <Text style={styles.name} numberOfLines={2}>
           {item.artName}
         </Text>
 
-        <View style={styles.priceContainer}>
-          <Text style={styles.price}>${item.price}</Text>
-          {item.limitedTimeDeal ? (
-            <View style={styles.dealBadge}>
-              <Text style={styles.dealText}>Sale</Text>
-            </View>
-          ) : null}
-        </View>
-
-        <Link href={`/art-tools/${item.id}`}>
-          <Text>View Details</Text>
+        <Link href={`/art-tools/${item.id}`} asChild>
+          <Pressable style={styles.viewDetailsButton}>
+            <Text style={styles.viewDetailsText}>View Details</Text>
+          </Pressable>
         </Link>
-
-        {/* Favorite button */}
-        <Pressable
-          style={styles.favoriteButton}
-          onPress={toggleFavorite}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Ionicons
-            name={isFav ? 'heart' : 'heart-outline'}
-            size={24}
-            color={isFav ? '#FF3B30' : '#8E8E93'}
-          />
-        </Pressable>
       </View>
+      <Pressable
+        style={styles.favoriteButton}
+        onPress={toggleFavorite}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      >
+        <Ionicons
+          name={isFav ? 'heart' : 'heart-outline'}
+          size={24}
+          color={isFav ? '#FF3B30' : '#8E8E93'}
+        />
+      </Pressable>
+
+      {item.limitedTimeDeal ? (
+        <View style={styles.dealBadge}>
+          <Text style={styles.dealText}>Sale</Text>
+        </View>
+      ) : null}
     </Pressable>
   );
 };
@@ -74,14 +74,16 @@ const ArtToolCard = ({ item }: { item: ArtTool }) => {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: 'white',
-    borderRadius: 12,
+    borderRadius: 6,
     overflow: 'hidden',
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    // For iOS - approximating your box-shadow
+    shadowColor: '#171a1f',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1,
+    // For Android
+    elevation: 2,
   },
   image: {
     width: '100%',
@@ -110,13 +112,18 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: SECONDARY_COLOR,
+    marginBottom: 4,
   },
   dealBadge: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: SECONDARY_COLOR,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 12,
-    marginLeft: 10,
+    borderRadius: 10,
+    alignSelf: 'flex-start',
+    position: 'absolute',
+    top: 12,
+    left: 12,
   },
   dealText: {
     color: 'white',
@@ -128,6 +135,23 @@ const styles = StyleSheet.create({
     top: 12,
     right: 12,
     zIndex: 1,
+  },
+  // Add these to your existing StyleSheet
+  viewDetailsButton: {
+    backgroundColor: PRIMARY_COLOR,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 4,
+    marginTop: 8,
+  },
+  viewDetailsText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
+    marginRight: 4,
   },
 });
 
