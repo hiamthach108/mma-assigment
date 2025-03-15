@@ -38,7 +38,16 @@ const ArtToolCard = ({ item }: { item: ArtTool }) => {
       />
       <View style={styles.contentContainer}>
         <View style={styles.priceContainer}>
-          <Text style={styles.price}>${item.price}</Text>
+          {item.limitedTimeDeal ? (
+            <>
+              <Text style={styles.discountedPrice}>
+                ${(item.price * (1 - Number(item.limitedTimeDeal))).toFixed(2)}
+              </Text>
+              <Text style={styles.originalPrice}>${item.price}</Text>
+            </>
+          ) : (
+            <Text style={styles.price}>${item.price}</Text>
+          )}
         </View>
         <Text style={styles.name} numberOfLines={2}>
           {item.artName}
@@ -64,7 +73,10 @@ const ArtToolCard = ({ item }: { item: ArtTool }) => {
 
       {item.limitedTimeDeal ? (
         <View style={styles.dealBadge}>
-          <Text style={styles.dealText}>Sale</Text>
+          <Text style={styles.dealText}>
+            {'-'}
+            {Number(item.limitedTimeDeal) * 100}% Off
+          </Text>
         </View>
       ) : null}
     </Pressable>
@@ -108,12 +120,23 @@ const styles = StyleSheet.create({
   priceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 4,
   },
   price: {
     fontSize: 18,
     fontWeight: 'bold',
     color: SECONDARY_COLOR,
-    marginBottom: 4,
+  },
+  discountedPrice: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: SECONDARY_COLOR,
+    marginRight: 8,
+  },
+  originalPrice: {
+    fontSize: 16,
+    color: '#888',
+    textDecorationLine: 'line-through',
   },
   dealBadge: {
     backgroundColor: SECONDARY_COLOR,

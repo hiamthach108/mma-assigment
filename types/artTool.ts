@@ -6,7 +6,7 @@ export type ArtTool = {
   glassSurface: boolean;
   image: string;
   brand: string;
-  limitedTimeDeal: boolean;
+  limitedTimeDeal: number;
   feedbacks: ArtToolFeedback[];
 };
 

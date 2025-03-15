@@ -15,6 +15,7 @@ import {
   Pressable,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -42,20 +43,41 @@ export default function HomeScreen() {
     };
   }, []);
 
-  // Filter data based on search query
+  // Add this to your HomeScreen component right after the state declarations
+  const [selectedBrand, setSelectedBrand] = useState('All');
+
+  // Add this function to your HomeScreen component
+  const filterByBrand = (brand: string) => {
+    setSelectedBrand(brand);
+  };
+
+  // Modify your filteredData useMemo to include brand filtering
   const filteredData = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return data;
+    // First filter by search query
+    let filtered = data;
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = data.filter(
+        item =>
+          item.artName.toLowerCase().includes(query) ||
+          item.brand.toLowerCase().includes(query) ||
+          item.description.toLowerCase().includes(query)
+      );
     }
 
-    const query = searchQuery.toLowerCase().trim();
-    return data.filter(
-      item =>
-        item.artName.toLowerCase().includes(query) ||
-        item.brand.toLowerCase().includes(query) ||
-        item.description.toLowerCase().includes(query)
-    );
-  }, [data, searchQuery]);
+    // Then filter by selected brand (if not 'All')
+    if (selectedBrand !== 'All') {
+      filtered = filtered.filter(item => item.brand === selectedBrand);
+    }
+
+    return filtered;
+  }, [data, searchQuery, selectedBrand]);
+
+  // Extract unique brands from data
+  const brands = useMemo(() => {
+    const uniqueBrands = [...new Set(data.map(item => item.brand))];
+    return ['All', ...uniqueBrands];
+  }, [data]);
 
   const renderItem = ({ item }: { item: ArtTool }) => (
     <View style={styles.cardContainer} key={item.id}>
@@ -103,6 +125,35 @@ export default function HomeScreen() {
               </Pressable>
             )}
           </View>
+        </View>
+
+        {/* Brand filter bar */}
+        <View style={styles.brandFilterContainer}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.brandScrollContent}
+          >
+            {brands.map(brand => (
+              <Pressable
+                key={brand}
+                style={[
+                  styles.brandFilter,
+                  selectedBrand === brand && styles.brandFilterSelected,
+                ]}
+                onPress={() => filterByBrand(brand)}
+              >
+                <Text
+                  style={[
+                    styles.brandFilterText,
+                    selectedBrand === brand && styles.brandFilterTextSelected,
+                  ]}
+                >
+                  {brand}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
         </View>
 
         {filteredData.length === 0 ? (
@@ -199,5 +250,35 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     paddingHorizontal: 24,
+  },
+  // Add to your existing styles
+  brandFilterContainer: {
+    marginBottom: 16,
+    paddingHorizontal: 4,
+  },
+  brandScrollContent: {
+    paddingRight: 16,
+  },
+  brandFilter: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  brandFilterSelected: {
+    backgroundColor: PRIMARY_COLOR,
+    borderColor: PRIMARY_COLOR,
+  },
+  brandFilterText: {
+    fontSize: 14,
+    color: '#555',
+    fontWeight: '500',
+  },
+  brandFilterTextSelected: {
+    color: 'white',
+    fontWeight: '600',
   },
 });
