@@ -31,6 +31,7 @@ const DetailPage = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
     const detailId = id as string;
     fetchData(detailId);
 
@@ -112,13 +113,24 @@ const DetailPage = () => {
 
       {/* Product Info */}
       <View style={styles.infoContainer}>
-        {data.limitedTimeDeal ? (
-          <View style={styles.dealBadge}>
-            <Text style={styles.dealText}>Sale</Text>
-          </View>
-        ) : (
-          <></>
-        )}
+        {/* Price Section */}
+        <View style={styles.priceContainer}>
+          {data.limitedTimeDeal ? (
+            <>
+              <Text style={styles.discountedPrice}>
+                ${(data.price * (1 - Number(data.limitedTimeDeal))).toFixed(2)}
+              </Text>
+              <Text style={styles.originalPrice}>${data.price.toFixed(2)}</Text>
+              <View style={styles.saveContainer}>
+                <Text style={styles.saveText}>
+                  Save ${(data.price * Number(data.limitedTimeDeal)).toFixed(2)}
+                </Text>
+              </View>
+            </>
+          ) : (
+            <Text style={styles.price}>${data.price.toFixed(2)}</Text>
+          )}
+        </View>
 
         <Text style={styles.brand}>{data.brand}</Text>
         <Text style={styles.title}>{data.artName}</Text>
@@ -230,7 +242,7 @@ const styles = StyleSheet.create({
   priceContainer: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    marginBottom: 16,
+    marginBottom: 8, // Reduced from 16 to accommodate the save amount
   },
   price: {
     fontSize: 28,
@@ -352,6 +364,27 @@ const styles = StyleSheet.create({
   backButtonText: {
     color: 'white',
     fontWeight: '600',
+  },
+
+  discountedPrice: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: SECONDARY_COLOR,
+    marginRight: 8,
+  },
+  originalPrice: {
+    fontSize: 20,
+    fontWeight: '400',
+    color: '#777',
+    textDecorationLine: 'line-through',
+  },
+  saveContainer: {
+    marginTop: 6,
+  },
+  saveText: {
+    fontSize: 14,
+    color: '#4CD964', // Green color for savings
+    fontWeight: '500',
   },
 });
 

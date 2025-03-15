@@ -6,16 +6,16 @@ import {
   FlatList,
   RefreshControl,
   Pressable,
+  SafeAreaView,
 } from 'react-native';
 import { ArtTool } from '@/types/artTool';
 import ArtToolCard from '@/components/ArtToolCard';
-import { ThemedText } from '@/components/ThemedText';
 import { useFocusEffect } from '@react-navigation/native';
 import { useFavorites } from '@/hooks/useFavorites';
-import MyScrollView from '@/components/MyScrollView';
 import LoadingScreen from '@/components/LoadingScreen';
 import { BACKGROUND_COLOR } from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
+import FavoriteItemCard from '@/components/FavoriteItemCard';
 
 export default function FavoriteScreen() {
   const { favorites, loading, refreshFavorites, resetFavorites } =
@@ -50,17 +50,14 @@ export default function FavoriteScreen() {
   const renderItem = ({ item }: { item: ArtTool }) => {
     return (
       <View style={styles.cardContainer}>
-        <ArtToolCard item={item} />
+        <FavoriteItemCard item={item} />
       </View>
     );
   };
 
-  if (loading && favorites.length === 0) {
-    return <LoadingScreen />;
-  }
-
-  return (
-    <MyScrollView style={styles.container}>
+  // Header component with clear button
+  const ListHeaderComponent = () => (
+    <>
       {favorites.length > 0 && (
         <View style={styles.headerContainer}>
           <Pressable style={styles.resetBtn} onPress={handleReset}>
@@ -69,15 +66,23 @@ export default function FavoriteScreen() {
           </Pressable>
         </View>
       )}
+    </>
+  );
 
+  if (loading && favorites.length === 0) {
+    return <LoadingScreen />;
+  }
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
       <FlatList
+        key={'single-column'} // Force re-render by changing the key
         data={favorites}
         renderItem={renderItem}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
-        numColumns={2}
-        columnWrapperStyle={styles.columnWrapper}
+        ListHeaderComponent={<ListHeaderComponent />}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>
@@ -93,22 +98,21 @@ export default function FavoriteScreen() {
           />
         }
       />
-    </MyScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: BACKGROUND_COLOR,
-    paddingTop: 12,
+    // paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    marginBottom: 16,
-    paddingHorizontal: 4,
+    marginVertical: 16,
   },
   headerText: {
     fontSize: 20,
@@ -128,20 +132,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: 4,
   },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   listContent: {
+    flexGrow: 1,
     paddingBottom: 20,
+    paddingHorizontal: 20,
   },
   columnWrapper: {
     justifyContent: 'space-between',
-    marginHorizontal: 4,
   },
   cardContainer: {
-    width: '48%',
+    width: '100%',
     marginBottom: 16,
   },
   emptyContainer: {
